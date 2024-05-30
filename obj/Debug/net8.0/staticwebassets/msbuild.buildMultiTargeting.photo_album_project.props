@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\photo_album_project.props" />
-</Project>
