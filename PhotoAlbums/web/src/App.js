@@ -1,6 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Router, Link } from "react-router-dom";
-import './App.css';
+import { Routes, Route, Link } from "react-router-dom";
 import Users from './pages/Users';
 
 function App() {
