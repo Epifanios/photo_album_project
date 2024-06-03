@@ -13,23 +13,29 @@ namespace PhotoAlbums.Controllers
     public class AlbumsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserService _userApiService;
 
-        public AlbumsController(ApplicationDbContext context)
+
+        public AlbumsController(ApplicationDbContext context, UserService userApiService)
         {
             _context = context;
+            _userApiService = userApiService;
         }
+
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Album>>> GetAlbums()
         {
-            return await _context.Albums.ToListAsync();
+            return await _context.Albums.ToListAsync(); //Get All Albums
         }
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Album>> GetAlbum(int id)
         {
-            var album = await _context.Albums.FindAsync(id);
+            var album = await _context.Albums.FindAsync(id);  //Get Album by passed ID parameter
 
+            //Check if album is exist
             if (album == null)
             {
                 return NotFound();
@@ -38,48 +44,78 @@ namespace PhotoAlbums.Controllers
             return album;
         }
 
+
         [HttpPost]
-        public async Task<ActionResult<Album>> PostAlbum([FromForm] Album album)
+        public async Task<ActionResult<Album>> CreateAlbum([FromForm] Album album)
         {
+            var users = await _userApiService.GetUsersAsync(); //Call User Service for fetching users
+
+            //Check if user is exist
+            if (!users.Any(c => c.Id == album.UserId))
+            {
+                return BadRequest("Invalid User.");
+            }
+
             _context.Albums.Add(album);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(PostAlbum), new { id = album.Id }, album);
+            return CreatedAtAction(nameof(GetAlbum), new { id = album.Id }, album);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> PutAlbum(int id, [FromBody] Album album)
+        public async Task<ActionResult> UpdateAlbum(int id, [FromForm] Album album)
         {
-            if (id != album.Id)
+            var getAlbum = await _context.Albums.FindAsync(id); //Get Album by passed ID parameter
+
+            if (getAlbum == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(album).State = EntityState.Modified;
-
-            try
+            var users = await _userApiService.GetUsersAsync(); //Call User Service for fetching users
+            
+            //Check if user is exist
+            if (!users.Any(c => c.Id == album.UserId))
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!AlbumExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest("Invalid category_id.");
             }
 
-            return NoContent();
+            //Save new values to existing values
+            getAlbum.Title = album.Title;
+            getAlbum.UserId = album.UserId;
+
+            _context.Albums.Update(getAlbum);
+            await _context.SaveChangesAsync();
+
+            // Return JSON result
+            return new JsonResult(getAlbum);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAlbum(int id)
+
+        [HttpGet("user/{id}")]
+        public async Task<ActionResult> GetAlbumsByUser(int id)
         {
-            var album = await _context.Albums.FindAsync(id);
+            // Get Albums by passed User ID parameter
+            var albums = await _context.Albums
+                .Where(p => p.UserId == id)
+                .ToListAsync();
+
+            //Check if the user has albums
+            if (albums == null || albums.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return Ok(albums);
+        }
+
+        
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteAlbum(int id)
+        {
+            var album = await _context.Albums.FindAsync(id); // Get Album by passed ID parameter
+
+            // Check if album is exist
             if (album == null)
             {
                 return NotFound();
@@ -88,13 +124,8 @@ namespace PhotoAlbums.Controllers
             _context.Albums.Remove(album);
             await _context.SaveChangesAsync();
 
-            return NoContent();
-        }
-
-        private bool AlbumExists(int id)
-        {
-            return _context.Albums.Any(e => e.Id == id);
-        }
+            return Ok("Album Deleted Successful");
+        }       
     }
 }
 
