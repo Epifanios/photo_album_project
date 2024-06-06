@@ -36,3 +36,47 @@
     transform: rotate(360deg);
   }
 }
+
+.spinner {
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important
+}
+
+.remove_btn {
+    padding: 5px 8px;
+    font-size: 20px;
+    top: -15px;
+    right: -15px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    cursor: pointer
+}
+
+.active>.page-link, .page-link.active {
+    z-index: 3;
+    color: #FFF;
+    background-color: #123abc;
+    border-color: #123abc;
+}
+
+.page-link {
+    color: #123abc;
+}
+
+.btn_form {
+    background-color: #123abc !important;
+    color: #fff !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #123abc
+}
+
+
+@media(max-width: 991px) {
+  .spinner {
+      margin-top: 50px;
+  }
+}
