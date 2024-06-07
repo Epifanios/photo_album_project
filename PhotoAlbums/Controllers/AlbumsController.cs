@@ -93,21 +93,46 @@ namespace PhotoAlbums.Controllers
 
 
         [HttpGet("user/{id}")]
-        public async Task<ActionResult> GetAlbumsByUser(int id)
+        public async Task<ActionResult> GetAlbumsByUser(int id, int page = 1, int pageSize = 10)
         {
-            // Get Albums by passed User ID parameter
-            var albums = await _context.Albums
-                .Where(p => p.UserId == id)
-                .ToListAsync();
+            if (page <= 0 || pageSize <= 0)
+            {
+                return BadRequest("Page number and page size must be greater than zero.");
+            }
 
-            //Check if the user has albums
-            if (albums == null || albums.Count == 0)
+            // Get total number of albums for the user
+            var totalAlbums = await _context.Albums
+                .Where(p => p.UserId == id)
+                .CountAsync();
+
+            // Check if the user has albums
+            if (totalAlbums == 0)
             {
                 return NotFound();
             }
 
-            return Ok(albums);
+            // Calculate total pages
+            var totalPages = (int)Math.Ceiling(totalAlbums / (double)pageSize);
+
+            // Fetch the albums for the current page
+            var albums = await _context.Albums
+                .Where(p => p.UserId == id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var response = new
+            {
+                Albums = albums,
+                TotalCount = totalAlbums,
+                Page = page,
+                PageSize = pageSize,
+                TotalPages = totalPages
+            };
+
+            return Ok(response);
         }
+
 
         
         [HttpDelete("{id}")]
