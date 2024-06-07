@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { fetchUsers } from '../Api';
 import SpinnerLoading from '../components/SpinnerLoading';
 import UsersMap from '../components/maps/UsersMap';
+import { FormattedMessage } from 'react-intl';
 
 function Users() {
     const [data, setData] = useState([]);
@@ -36,7 +37,7 @@ function Users() {
     return (
         <div className="container text-center">
             <div className="row mt-3 mb-5">
-                <h1>Users Page</h1>
+                <h1><FormattedMessage id="UsersTitle"/></h1>
             </div> 
             <UsersMap users={data}/>
         </div>

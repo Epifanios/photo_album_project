@@ -6,6 +6,7 @@ import UploadPhotosForm from '../components/forms/UploadPhotosForm';
 import FilterAlbumsForm from '../components/forms/FilterAlbumsForm';
 import SpinnerLoading from '../components/SpinnerLoading';
 import Pagination from '../components/Pagination';
+import { FormattedMessage } from 'react-intl';
 
 function Photos() {
     const { userId, albumId } = useParams();
@@ -101,18 +102,18 @@ function Photos() {
     return (
         <div className="container text-center">
             <div className="row mt-4">
-                <h2 className="pb-5 mb-5">Photos of {albumTitle}</h2>
+                <h2 className="pb-5 mb-5"><FormattedMessage id="PhotosOf"/> {albumTitle}</h2>
 
                 <div className="col-xl-3 text-start ">
                     <div className="back_link pb-5">
                         <a href={`/user/${userId}/albums`}>
-                            <i className="bi bi-chevron-left pr-4">Back to Albums</i>
+                            <i className="bi bi-chevron-left pr-4"><FormattedMessage id="BackToAlbums"/></i>
                         </a>
                     </div>
-                    <h5 className="mb-3 text-start">Add New Photo</h5>
+                    <h5 className="mb-3 text-start"><FormattedMessage id="AddNewPhoto"/></h5>
                     <UploadPhotosForm albumId={selectedAlbum} addPhotos={addPhoto} />
 
-                    <h5 className="pt-5 mb-3 text-start">Filter Album</h5>
+                    <h5 className="pt-5 mb-3 text-start"><FormattedMessage id="FilterAlbum"/></h5>
                     <FilterAlbumsForm albums={albums} selectedAlbum={selectedAlbum} onAlbumChange={onHandleAlbumChange} />                  
                 </div>
                 <div className="col-xl-9 mt-xl-0 mt-5 position-relative">
@@ -123,7 +124,7 @@ function Photos() {
                     ) : (
                         <>
                             {photos.length === 0 ? (
-                                <p className="text-center">No photos available for this album.</p>
+                                <p className="text-center"><FormattedMessage id="NoPhotos"/></p>
                             ) : (
                                 <PhotosMap photos={photos} onDelete={onHandleDeletePhoto} />
                             )}

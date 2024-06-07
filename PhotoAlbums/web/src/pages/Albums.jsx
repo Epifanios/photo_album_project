@@ -5,6 +5,7 @@ import CreateAlbumsForm from '../components/forms/CreateAlbumsForm';
 import { fetchUsersByID, fetchAlbumsByUser, deleteAlbumById } from '../Api';
 import SpinnerLoading from '../components/SpinnerLoading';
 import Pagination from '../components/Pagination';
+import { FormattedMessage } from 'react-intl';
 
 function Albums() {
     const { userId } = useParams();
@@ -99,15 +100,15 @@ function Albums() {
     return (
         <div className="container text-center">
             <div className="row mt-4">
-                <h2 className="pb-5 mb-5">Albums of {userName}</h2>
+                <h2 className="pb-5 mb-5"><FormattedMessage id="AlbumsOf"/> {userName}</h2>
 
                 <div className="col-lg-3 text-start">
                     <div className="back_link pb-5">
                         <a href={`/`}>
-                            <i className="bi bi-chevron-left pr-4">Back to Users</i>
+                            <i className="bi bi-chevron-left pr-4"><FormattedMessage id="BackToUsers"/></i>
                         </a>
                     </div>
-                    <h5 className="mb-3 text-start">{isEditing ? 'Edit' : 'Add New'} Album</h5>
+                    <h5 className="mb-3 text-start">{isEditing ? <FormattedMessage id="Edit"/> : <FormattedMessage id="AddNewAlbum"/>}</h5>
                     <CreateAlbumsForm userId={userId} addAlbum={addAlbum} onSave={onHandleSave} album={editingAlbum} isEditing={isEditing}/>                                     
                 </div>
                 <div className="col-lg-9 mt-lg-0 mt-5">
@@ -118,7 +119,7 @@ function Albums() {
                     ) : (
                         <>
                             {albums.length === 0 ? (
-                                <p className="text-center">No albums available for this user.</p>
+                                <p className="text-center"><FormattedMessage id="NoAlbums"/></p>
                             ) : (
                                 <AlbumsMap albums={albums} userId={userId} onDelete={onHandleDeleteAlbum} onEdit={onHandleEdit}/>
                             )}

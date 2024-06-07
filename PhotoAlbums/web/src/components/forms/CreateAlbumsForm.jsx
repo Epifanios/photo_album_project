@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Toast from '../Toast';
 import { createAlbum, updateAlbum } from '../../Api';
+import { FormattedMessage } from 'react-intl';
 
 const CreateAlbumsForm = ({ userId, addAlbum, onSave, album, isEditing }) => {
     const [title, setTitle] = useState(album.title);
@@ -55,7 +56,7 @@ const CreateAlbumsForm = ({ userId, addAlbum, onSave, album, isEditing }) => {
                 {successMesssage &&  <Toast show={showToast} type="success" message={successMesssage} onClose={() => setShowToast(false)}/>}
 
                 <div className="d-flex justify-content-start">
-                    <button className="btn btn_form mt-3 text-start" type="submit" onClick={() => triggerError(error)}>{isEditing ? 'Update' : 'Create'}</button>
+                    <button className="btn btn_form mt-3 text-start" type="submit" onClick={() => triggerError(error)}>{isEditing ? <FormattedMessage id="Update"/> : <FormattedMessage id="Create"/>}</button>
                 </div>
             </form>
         </div>

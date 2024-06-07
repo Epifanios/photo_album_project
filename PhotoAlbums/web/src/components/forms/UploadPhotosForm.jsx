@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import Toast from '../Toast';
 import { uploadPhotos } from '../../Api';
+import { FormattedMessage } from 'react-intl';
 
 const UploadPhotosForm = ({ albumId, addPhotos }) => {
     const [title, setTitle] = useState('');
@@ -30,7 +31,7 @@ const UploadPhotosForm = ({ albumId, addPhotos }) => {
         } else {
             setFile(null);
             fileInputRef.current.value = ''; // Clear file input field using ref
-            setError('Please select a valid image file.');
+            setError(<FormattedMessage id="ValidImage"/>);
         }
     };
 
@@ -62,7 +63,7 @@ const UploadPhotosForm = ({ albumId, addPhotos }) => {
                 {successMesssage &&  <Toast show={showToast} type="success" message={successMesssage} onClose={() => setShowToast(false)}/>}
 
                 <div className="d-flex justify-content-start">
-                    <button className="btn btn_form mt-3 text-start" type="submit" onClick={() => triggerError(error)}>Upload</button>
+                    <button className="btn btn_form mt-3 text-start" type="submit" onClick={() => triggerError(error)}><FormattedMessage id="Upload"/></button>
                 </div>
             </form>
         </div>

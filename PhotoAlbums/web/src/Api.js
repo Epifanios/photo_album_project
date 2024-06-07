@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { FormattedMessage } from 'react-intl';
 
 // USERS //
 
@@ -29,7 +30,7 @@ export const fetchUsersByID = async (userId, setUsername) => {
 export const createAlbum = async (userId, title, addAlbum, setSuccessMessage, setError, setTitle) => {
     //Validation
     if (!title) {
-        setError('Title is required.');
+        setError(<FormattedMessage id="TitleRequired"/>);
         return;
     }
 
@@ -56,7 +57,7 @@ export const createAlbum = async (userId, title, addAlbum, setSuccessMessage, se
 export const updateAlbum = async (userId, albumId, title, onSave, setSuccessMessage, setError, setTitle) => {
     //Validation
     if (!title) {
-        setError('Title is required.');
+        setError(<FormattedMessage id="TitleRequired"/>);
         return;
     }
 
@@ -67,7 +68,7 @@ export const updateAlbum = async (userId, albumId, title, onSave, setSuccessMess
     try {
         const response = await axios.put(`/api/albums/${albumId}`, formData);     
         onSave(response.data);
-        setSuccessMessage('Album updated successfully!');
+        setSuccessMessage(<FormattedMessage id="AlbumSuccessUpdated"/>);
 
         //Clear form fields
         setError(null);
@@ -168,7 +169,7 @@ export const deletePhotoById = async (photoId) => {
 export const uploadPhotos = async (albumId, file, title, addPhotos, setSuccessMessage, setError, setFile, setTitle, fileInputRef) => {
     //Validation
     if (!file || !title) {
-        setError('Both file and title are required.');
+        setError(<FormattedMessage id="BothFileTitleRequired"/>);
         return;
     }
 
@@ -185,7 +186,7 @@ export const uploadPhotos = async (albumId, file, title, addPhotos, setSuccessMe
         
         //save new photo to prop
         addPhotos(response.data);
-        setSuccessMessage('Photos uploaded successfully!');
+        setSuccessMessage(<FormattedMessage id="PhotosSuccessCreated"/>);
 
         //Clear form fields
         setError(null);

@@ -1,4 +1,5 @@
 import React from 'react';
+import { FormattedMessage } from 'react-intl';
 
 const AlbumsMap = ({ albums, userId, onDelete, onEdit }) => {
     return (
@@ -15,7 +16,7 @@ const AlbumsMap = ({ albums, userId, onDelete, onEdit }) => {
                         <button className="remove_btn position-absolute border-0" onClick={() => onDelete(album.id)}>
                             <i className="bi bi-trash"></i>
                         </button>
-                        <button className="btn btn_form mt-3 text-start" onClick={() => onEdit(album)}>Edit</button>
+                        <button className="btn btn_form mt-3 text-start" onClick={() => onEdit(album)}><FormattedMessage id="Edit"/></button>
                     </div>
                 ))}
             </div>
