@@ -28,6 +28,11 @@
   color: #61dafb;
 }
 
+.album_col a {
+  color: #2b2b2b;
+  text-decoration: none;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -46,8 +51,8 @@
 .remove_btn {
     padding: 5px 8px;
     font-size: 20px;
-    top: -15px;
-    right: -15px;
+    top: -3px;
+    right: 0px;
     background-color: red;
     color: white;
     border-radius: 50%;
@@ -74,9 +79,46 @@ h1, h2, h3, h4, h5, h6 {
   color: #123abc
 }
 
+.album_col, .photo_col {
+  width: 20%;
+}
+
+.album_col i.bi-images {
+  font-size: 60px;
+  color: #70d1e6;
+}
+
+.photo_col {
+  height: 220px;
+
+}
+
+.col_image {
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  /* padding: 30px; */
+}
+
+.back_link a {
+  font-size: 14px;
+  color: #123abc
+}
+
 
 @media(max-width: 991px) {
   .spinner {
       margin-top: 50px;
   }
+
+  .album_col, .photo_col {
+    width: 50%;
+  }
 }
+
+@media(max-width: 424px) {
+  .photo_col {
+    width: 100%;
+  }
+}
+
