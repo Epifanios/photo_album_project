@@ -13,20 +13,19 @@ function Albums() {
     const [albums, setAlbums] = useState([]);
     const [userName, setUserName] = useState('');
 
-    //Edit Form
+    // Edit Form
     const [editingAlbum, setEditingAlbum] = useState({ title: '' });
     const [isEditing, setIsEditing] = useState(false);
 
-    //Pagination
+    // Pagination
     const [currentPage, setCurrentPage] = useState(1);
     const [totalCount, setTotalCount] = useState(0);
     const pageSize = 10;
 
-
     const fetchAlbums = useCallback(async (page = currentPage) => {
         setLoading(true);
+        setError(null); // Reset the error state before making the API call
         try {
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Introduce a 2-second delay for spinner
             const { albums: fetchedAlbums, totalCount: total } = await fetchAlbumsByUser(userId, false, page, pageSize);
             setAlbums(fetchedAlbums);
             setTotalCount(total);
@@ -37,31 +36,34 @@ function Albums() {
         }
     }, [userId, currentPage, pageSize]);
 
-
-    useEffect(() => {    
-        fetchAlbums();
-        // Fetch the user's name
-        fetchUsersByID(userId, setUserName);
+    useEffect(() => {
+        fetchAlbums(currentPage);
+        const fetchUserName = async () => {
+            try {
+                const user = await fetchUsersByID(userId);
+                setUserName(user.name);
+            } catch (error) {
+                setError('Error fetching user name');
+            }
+        };
+        fetchUserName();
     }, [userId, currentPage, fetchAlbums]);
 
-
-    //Add new album to existing values on the state
+    // Add new album to existing values on the state
     const addAlbum = (newAlbum) => {
+        setAlbums((prevAlbums) => [...prevAlbums, newAlbum]);
+        setTotalCount((prevCount) => prevCount + 1);
         const totalPages = Math.ceil((totalCount + 1) / pageSize);
         if (currentPage < totalPages) {
             setCurrentPage(totalPages);
         }
-        setAlbums((prevAlbums) => [...prevAlbums, newAlbum]);
-        setTotalCount((prevCount) => prevCount + 1); // Increase total count by 1
     };
 
-
-    //Set edit states value for edit button
+    // Set edit states value for edit button
     const onHandleEdit = (album) => {
         setEditingAlbum(album);
         setIsEditing(true);
     };
-
 
     const onHandleSave = (album) => {
         if (isEditing) {
@@ -73,30 +75,26 @@ function Albums() {
         setIsEditing(false);
     };
 
-
     const handlePageChange = (newPage) => {
-      setCurrentPage(newPage);
+        setCurrentPage(newPage);
     };
 
-
     const onHandleDeleteAlbum = async (albumId) => {
-      try {
-          await deleteAlbumById(albumId);
-          const updatedAlbums = albums.filter((album) => album.id !== albumId);
+        try {
+            await deleteAlbumById(albumId);
+            const updatedAlbums = albums.filter((album) => album.id !== albumId);
             setAlbums(updatedAlbums);
             setTotalCount((prevCount) => prevCount - 1);
 
-            // Check if we need to fetch the previous page
             if (updatedAlbums.length === 0 && currentPage > 1) {
                 setCurrentPage((prevPage) => prevPage - 1);
             } else {
-              fetchAlbums();
-          }
-      } catch (err) {
-          setError('An error occurred while deleting the album.');
-      }
+                fetchAlbums(currentPage);
+            }
+        } catch (err) {
+            setError('An error occurred while deleting the album.');
+        }
     };
-  
 
     return (
         <div className="container text-center">
@@ -110,7 +108,7 @@ function Albums() {
                         </a>
                     </div>
                     <h5 className="mb-3 text-start">{isEditing ? 'Edit' : 'Add New'} Album</h5>
-                    <CreateAlbumsForm userId={userId}  addAlbum={addAlbum} onSave={onHandleSave} album={editingAlbum} isEditing={isEditing}/>                                     
+                    <CreateAlbumsForm userId={userId} addAlbum={addAlbum} onSave={onHandleSave} album={editingAlbum} isEditing={isEditing}/>                                     
                 </div>
                 <div className="col-lg-9 mt-lg-0 mt-5">
                     {loading ? (
@@ -119,16 +117,16 @@ function Albums() {
                         <p style={{ color: 'red' }}>{error}</p>
                     ) : (
                         <>
-                        {albums.length === 0 ? (
-                            <p className="text-center">No albums available for this user.</p>
-                        ) : (
-                            <AlbumsMap albums={albums} userId={userId} onDelete={onHandleDeleteAlbum} onEdit={onHandleEdit}/>
-                        )}
+                            {albums.length === 0 ? (
+                                <p className="text-center">No albums available for this user.</p>
+                            ) : (
+                                <AlbumsMap albums={albums} userId={userId} onDelete={onHandleDeleteAlbum} onEdit={onHandleEdit}/>
+                            )}
                             <div className="w-100 d-flex justify-content-center mt-3">
                                 <Pagination
                                     currentPage={currentPage}
                                     pageSize={pageSize}
-                                    totalItems={totalCount} // Use the total count from the API
+                                    totalItems={totalCount}
                                     onPageChange={handlePageChange}
                                 />  
                             </div>                    

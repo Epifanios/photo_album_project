@@ -103,13 +103,7 @@ namespace PhotoAlbums.Controllers
             // Get total number of albums for the user
             var totalAlbums = await _context.Albums
                 .Where(p => p.UserId == id)
-                .CountAsync();
-
-            // Check if the user has albums
-            if (totalAlbums == 0)
-            {
-                return NotFound();
-            }
+                .CountAsync();         
 
             // Calculate total pages
             var totalPages = (int)Math.Ceiling(totalAlbums / (double)pageSize);

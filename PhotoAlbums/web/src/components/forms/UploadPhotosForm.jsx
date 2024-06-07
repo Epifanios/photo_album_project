@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import axios from 'axios';
 import Toast from '../Toast';
 import { uploadPhotos } from '../../Api';
 
