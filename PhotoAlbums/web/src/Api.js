@@ -1,33 +1,29 @@
 import axios from 'axios';
 
+// USERS //
 
 export const fetchUsers = async () => {
-    const response = await fetch('https://jsonplaceholder.typicode.com/users');
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
+    try {
+        const response = await axios.get(`https://jsonplaceholder.typicode.com/users`);
+        return response.data;
+    } catch (error) {
+        throw new Error('Network response was not ok');
     }
-    return await response.json();
 };
 
 
 export const fetchUsersByID = async (userId, setUsername) => {
     try {
         const response = await axios.get(`https://jsonplaceholder.typicode.com/users/${userId}`);
-        setUsername(response.data.name);
+        return response.data;
     } catch (error) {
         throw new Error('Error fetching user details');
     }
 };
 
 
-export const fetchAlbums = async () => {
-  const response = await fetch('/api/albums');
-  if (!response.ok) {
-    throw new Error('Network response was not ok');
-  }
-  return await response.json();
-};
 
+// ALBUMS //
 
 // CREATE NEW ALBUM
 export const createAlbum = async (userId, title, addAlbum, setSuccessMessage, setError, setTitle) => {

@@ -105,6 +105,30 @@ h1, h2, h3, h4, h5, h6 {
   color: #123abc
 }
 
+.users_row {
+  overflow-wrap: break-word;
+}
+
+.users_row a {
+  text-decoration: none;
+}
+
+i.bi-person-circle {
+  font-size: 90px;
+  color: #123abc
+}
+
+.username {
+  color: #2b2b2b;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.email {
+  font-size: 12px;
+  color: #123abc
+}
+
 
 @media(max-width: 991px) {
   .spinner {

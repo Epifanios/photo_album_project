@@ -28,7 +28,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Photo Albums API", Version = "v1" });
     c.OperationFilter<RemoveIdPropertyFilter>();
-    c.OperationFilter<FileUploadOperationFilter>();
     c.EnableAnnotations();
     c.MapType<IFormFile>(() => new OpenApiSchema { Type = "string", Format = "binary" });
 });
