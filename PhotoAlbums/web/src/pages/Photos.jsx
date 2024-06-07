@@ -17,38 +17,49 @@ function Photos() {
     const [selectedAlbum, setSelectedAlbum] = useState(albumId);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalCount, setTotalCount] = useState(0);
-    const pageSize = 8;
+    const pageSize = 10;
 
-
+    // Fetch albums only once when userId changes
     useEffect(() => {
-        fetchAlbumsByUser(userId, setAlbums, setLoading); //Get Albums by User
+        const fetchAlbums = async () => {
+            try {
+                setLoading(true);
+                const { albums: fetchedAlbums } = await fetchAlbumsByUser(userId, true);
+                setAlbums(fetchedAlbums);
+                setLoading(false);
+            } catch (error) {
+                setError('Error fetching albums');
+                setLoading(false);
+            }
+        };
+        fetchAlbums();
     }, [userId]);
 
-
+    // Fetch album details and photos when selectedAlbum or currentPage changes
     useEffect(() => {
+        const fetchAlbumDetailsAndPhotos = async () => {
+            try {
+                setLoading(true);
+                await fetchAlbumByID(selectedAlbum, setAlbumTitle);
+                const { photos: fetchedPhotos, totalCount: total } = await fetchPhotosByAlbum(selectedAlbum, currentPage, pageSize);
+                setPhotos(fetchedPhotos);
+                setTotalCount(total);
+                setLoading(false);
+            } catch (error) {
+                setError('Error fetching album details or photos');
+                setLoading(false);
+            }
+        };
         if (selectedAlbum) {
-            const fetchAlbumDetailsAndPhotos = async () => {
-                try {
-                    setLoading(true);
-                    await fetchAlbumByID(selectedAlbum, setAlbumTitle); //Get Album Id
-                    await fetchPhotosByAlbum(selectedAlbum, setPhotos, setTotalCount, currentPage, pageSize); //Get photos by Album Id
-                    setLoading(false);
-                } catch (error) {
-                    setError('Error fetching album details or photos');
-                    setLoading(false);
-                }
-            };
             fetchAlbumDetailsAndPhotos();
         }
     }, [selectedAlbum, currentPage]);
 
-    //Handle Album value
     const onHandleAlbumChange = (e) => {
         setSelectedAlbum(e.target.value);
         setCurrentPage(1); // Reset to first page when album changes
     };
 
-    //Add new photo to existing values on the state
     const addPhoto = (newPhoto) => {
         setPhotos((prevPhotos) => {
             const updatedPhotos = [...prevPhotos, newPhoto];
@@ -59,55 +70,68 @@ function Photos() {
             return updatedPhotos;
         });
         setTotalCount(prevCount => prevCount + 1); // Increase total count by 1
-
     };
-
 
     const onHandleDeletePhoto = async (photoId) => {
         try {
             await deletePhotoById(photoId);
-            setPhotos((prevPhotos) => prevPhotos.filter(photo => photo.id !== photoId));
             setTotalCount(prevCount => prevCount - 1); // Decrease total count by 1
+
+            const updatedPhotos = photos.filter(photo => photo.id !== photoId);
+            setPhotos(updatedPhotos);
+
+            // Refetch photos to reflect the changes
+            const { photos: fetchedPhotos, totalCount: total } = await fetchPhotosByAlbum(selectedAlbum, currentPage, pageSize);
+            setPhotos(fetchedPhotos);
+            setTotalCount(total);
+
+            // Adjust the current page if necessary
+            if (fetchedPhotos.length === 0 && currentPage > 1) {
+                setCurrentPage(prevPage => prevPage - 1);
+            }
         } catch (error) {
             setError('Error deleting photo');
         }
     };
 
-
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
     };
-
 
     return (
         <div className="container text-center">
             <div className="row mt-4">
                 <h2 className="pb-5 mb-5">Photos of {albumTitle}</h2>
 
-                <div className="col-lg-3">
+                <div className="col-xl-3 text-start ">
+                    <div className="back_link pb-5">
+                        <a href={`/user/${userId}/albums`}>
+                            <i className="bi bi-chevron-left pr-4">Back to Albums</i>
+                        </a>
+                    </div>
                     <h5 className="mb-3 text-start">Add New Photo</h5>
                     <UploadPhotosForm albumId={selectedAlbum} addPhotos={addPhoto} />
 
                     <h5 className="pt-5 mb-3 text-start">Filter Album</h5>
                     <FilterAlbumsForm albums={albums} selectedAlbum={selectedAlbum} onAlbumChange={onHandleAlbumChange} />                  
                 </div>
-                <div className="col-lg-9 d-flex justify-content-center position-relative flex-wrap mt-lg-0 mt-5">
+                <div className="col-xl-9 mt-xl-0 mt-5 position-relative">
                     {loading ? (
-                        <SpinnerLoading loading={loading}/>
+                        <SpinnerLoading loading={loading} />
                     ) : error ? (
                         <p style={{ color: 'red' }}>{error}</p>
                     ) : (
                         <>
-                        {photos.length === 0 ? (
-                            <p className="text-center">No photos available for this album.</p>
-                        ) : (
-                            <PhotosMap photos={photos} onDelete={onHandleDeletePhoto}/>
-                        )}
+                            {photos.length === 0 ? (
+                                <p className="text-center">No photos available for this album.</p>
+                            ) : (
+                                <PhotosMap photos={photos} onDelete={onHandleDeletePhoto} />
+                            )}
                             <div className="w-100 d-flex justify-content-center mt-3">
                                 <Pagination
                                     currentPage={currentPage}
                                     pageSize={pageSize}
-                                    totalItems={totalCount} // Use the total count from the API
+                                    totalItems={totalCount}
                                     onPageChange={handlePageChange}
                                 />  
                             </div>                    

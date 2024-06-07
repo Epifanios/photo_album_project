@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import Toast from '../Toast';
+import { uploadPhotos } from '../../Api';
 
 const UploadPhotosForm = ({ albumId, addPhotos }) => {
     const [title, setTitle] = useState('');
@@ -15,8 +16,8 @@ const UploadPhotosForm = ({ albumId, addPhotos }) => {
         setError(message);
 
         setTimeout(() => {
-        setShowToast(false);
-        setError(null);
+            setShowToast(false);
+            setError(null);
         }, 5000);
     };
 
@@ -36,42 +37,8 @@ const UploadPhotosForm = ({ albumId, addPhotos }) => {
 
     //Upload new Photo
     const onhandleSubmitPhotos = async (e) => {
-        e.preventDefault();
-        
-        //Validation
-        if (!file || !title) {
-            setError('Both file and title are required.');
-            return;
-        }
-    
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('title', title);
-    
-        try {
-            const response = await axios.post(`/api/photos/album/${albumId}/upload`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-            
-            //save new photo to prop
-            addPhotos(response.data);
-            setSuccessMessage('Photos uploaded successfully!');
-
-            //Clear form fields
-            setError(null);
-            setFile(null);
-            setTitle(''); 
-            fileInputRef.current.value = ''; // Clear file input field using ref
-    
-        } catch (err) {
-            if (err.response && err.response.data) {
-                setError(`Error: ${err.response.data}`);
-            } else {
-                setError('An error occurred while uploading the photos.');
-            }
-        }
+        e.preventDefault();      
+        uploadPhotos(albumId, file, title, addPhotos, setSuccessMessage, setError, setFile, setTitle, fileInputRef)
     }
 
     return (
